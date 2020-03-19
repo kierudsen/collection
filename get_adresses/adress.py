@@ -1,18 +1,21 @@
 import requests
 
-response = requests.get('https://ws.geonorge.no/adresser/v1/')
-print(response.status_code) # If 200 you are good to go
 
-def samlet():
-    nord = input('lat/nord:')
-    oest = input('lon/øst:')
-    rundt = input('radius:')
-    return f'https://ws.geonorge.no/adresser/v1/punktsok?radius={rundt}&lat={nord}&lon={oest}&treffPerSide=10&side=0&asciiKompatibel=true'
+class GetAdress:
 
-#61.086398, 10.485384 just an example
-response = requests.get(samlet())
+    def __init__(self, nord, oest, radius):
+        self.nord = nord
+        self.oest = oest
+        self.radius = radius
+        self.response = requests.get(
+            f'https://ws.geonorge.no/adresser/v1/punktsok?radius={self.radius}&lat={self.nord}&lon={self.oest}&treffPerSide=10&side=0&asciiKompatibel=true')
 
-result = response.json()
+    def is_ok(self):
+        return self.response.status_code
 
-for i in result['adresser']:
-    print(i['adressetekst'], i['postnummer'], i['kommunenavn'])
+    def get_list(self):
+        result = self.response.json()
+        adr_list = []
+        for i in result['adresser']:
+            adr_list.append(i['adressetekst'])
+        return adr_list
